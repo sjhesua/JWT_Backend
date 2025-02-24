@@ -164,6 +164,13 @@ DJOSER = {
     'TOKEN_MODEL': None,
     'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': getenv('REDIRECT_URLS').split(',')
 }
+# Configuración de la cookie de sesión
+#SESSION_COOKIE_SECURE = False
+#SESSION_COOKIE_SAMESITE = 'None'
+
+# Configuración de la cookie CSRF
+#CSRF_COOKIE_SECURE = False
+#CSRF_COOKIE_SAMESITE = 'None'
 
 AUTH_COOKIE = 'access'
 AUTH_COOKIE_MAX_AGE = 60 * 60 * 24
