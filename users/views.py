@@ -2,6 +2,8 @@ from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import AllowAny
+
 from djoser.social.views import ProviderAuthView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -95,18 +97,27 @@ class CustomTokenRefreshView(TokenRefreshView):
 
 class CustomTokenVerifyView(TokenVerifyView):
     def post(self, request, *args, **kwargs):
-        access_token = request.COOKIES.get('access')
+        # Obtén el token de la cookie
+        access_token = request.COOKIES.get('access', None)
 
-        if access_token:
-            request.data['token'] = access_token
+        # Si no hay token, devuelve una respuesta indicando que no está autenticado
+        if not access_token:
+            return Response(
+                {"detail": "No access token provided. User is not authenticated."},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
 
+        # Asigna el token a request.data['token']
+        request.data['token'] = access_token
+
+        # Llama al método 'post' de la clase base
         return super().post(request, *args, **kwargs)
 
-
 class LogoutView(APIView):
+    permission_classes = [AllowAny]
     def post(self, request, *args, **kwargs):
         response = Response(status=status.HTTP_204_NO_CONTENT)
-        response.delete_cookie('access')
-        response.delete_cookie('refresh')
+        response.delete_cookie('access', path='/', samesite='None')
+        response.delete_cookie('refresh', path='/', samesite='None')
 
         return response
